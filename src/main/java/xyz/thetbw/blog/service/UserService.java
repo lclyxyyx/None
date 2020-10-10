@@ -10,7 +10,9 @@ import xyz.thetbw.blog.data.constant.ConstValue;
 import xyz.thetbw.blog.data.constant.FieldKey;
 import xyz.thetbw.blog.data.constant.SettingKey;
 import xyz.thetbw.blog.data.dao.UserDao;
+import xyz.thetbw.blog.data.dao.UserPowerDao;
 import xyz.thetbw.blog.data.dao.UserSettingDao;
+import xyz.thetbw.blog.data.entity.Power;
 import xyz.thetbw.blog.data.entity.User;
 import xyz.thetbw.blog.data.entity.UserSetting;
 import xyz.thetbw.blog.exception.*;
@@ -19,15 +21,9 @@ import xyz.thetbw.blog.util.EncodeUtils;
 import xyz.thetbw.blog.util.RandomUtils;
 import xyz.thetbw.blog.util.StringUtils;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,6 +47,9 @@ public class UserService {
     @Autowired
     UserSettingDao userSettingDao;
 
+    @Autowired
+    UserPowerDao userPowerDao;
+
     private String defaultAvatar="//secure.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?s=80&r=G&d=mm";
 
     /**
@@ -63,6 +62,8 @@ public class UserService {
 
 
     }
+
+
 
 
     public void checkUser(String user_name,String user_pass) throws UserNotFountException,UserAccessErrorException {
@@ -112,7 +113,7 @@ public class UserService {
                 user_pass,
                 user_email,
                 defaultAvatar,
-                User.USER_ROLE_MENMBER
+                User.USER_ROLE_MEMBER
         );
         return user;
     }
@@ -196,6 +197,70 @@ public class UserService {
 
 
     /**
+     * 添加用户,用户管理
+     */
+    @Transactional
+    public void addUser(User user) throws RequestException {
+        checkUser(user,false);
+        userDao.add(user);
+        if (user.getPowers()!=null&&user.getPowers().size()>0){
+            for (Power power : user.getPowers()) {
+                userPowerDao.insertUserPower(user.getUser_id(),power.getPower_id());
+            }
+        }
+    }
+
+    /**
+     * 更新用户 用户管理
+     * @param user
+     */
+    public void updateUser(User user) throws RequestException {
+        if (user.getUser_role()==User.USER_ROLE_SUPER_ADMIN){
+            throw new RequestException("禁止编辑超级管理员");
+        }
+        checkUser(user,true);
+        if (user.getUser_pass_string()==null){
+            userDao.updateWithOutPass(user);
+        }else {
+            userDao.update(user);
+        }
+
+        userPowerDao.deleteUserPowers(user.getUser_id());
+        if (user.getPowers()!=null&&user.getPowers().size()>0){
+            for (Power power : user.getPowers()) {
+                userPowerDao.insertUserPower(user.getUser_id(),power.getPower_id());
+            }
+        }
+    }
+
+    private void checkUser(User user,boolean update) throws RequestException {
+        if (user==null){
+            throw new RequestException("用户不能为空");
+        }
+        StringUtils utils = StringUtils.getInstance();
+        String name=utils.validString(user.getUser_name());
+        String nickname = utils.htmlTrans(utils.validString(user.getUser_nickname()));
+        if (!update) {
+
+            User u = userDao.getUserByNickName(nickname);
+            if (u == null) {
+                u = userDao.getUserByName(name);
+            }
+            if (u != null) {
+                throw new RequestException("用户名或昵称重复");
+            }
+
+        }
+        if (user.getUser_pass_string()!=null){
+            String password = StringUtils.getInstance().validString(user.getUser_pass_string());
+            user.setUser_pass(password.hashCode());
+        }
+        user.setUser_name(name);
+        user.setUser_nickname(nickname);
+
+    }
+
+    /**
      * 从cookie加载用户 然后放进session里，如果有的话
      */
     private void getUserFromCookie() throws UserException {
@@ -232,7 +297,7 @@ public class UserService {
         String user_avatar_url = hashMap.get(SettingKey.USER_AVATAR_URL);
         String commentWithEmail = hashMap.get(SettingKey.COMMENT_WITH_EMAIL);
 //        User user =(User) request.getSession().getAttribute(FieldKey.USER_ACCESS);
-        User user = userDao.getAdminUser();
+        User user = (User)request.getSession().getAttribute(FieldKey.USER_ACCESS);
         user.setUser_email(user_email);
         user.setUser_nickname(user_nickname);
         user.setUser_avatar_url(user_avatar_url);
@@ -248,6 +313,7 @@ public class UserService {
             userSetting.setUser_setting_value(commentWithEmail);
             userSettingDao.update(userSetting);
         }
+        request.getSession().setAttribute(FieldKey.USER_ACCESS,user);
 
 
     }
@@ -258,7 +324,7 @@ public class UserService {
      */
     public HashMap<String,String> getUserInfo(){
         HashMap<String,String> hashMap = new HashMap<>();
-        User user = userDao.getAdminUser();
+        User user = (User)request.getSession().getAttribute(FieldKey.USER_ACCESS);
         user.clearPass();
         hashMap.put(SettingKey.USER_AVATAR_URL,user.getUser_avatar_url());
         hashMap.put(SettingKey.USER_EMAIL,user.getUser_email());
@@ -276,7 +342,7 @@ public class UserService {
      * @param newPass
      */
     public void updateUserPass(String oldPass,String newPass,HttpServletResponse response){
-        User user = userDao.getAdminUser();
+        User user = (User)request.getSession().getAttribute(FieldKey.USER_ACCESS);;
         if (user.getUser_pass()!=oldPass.hashCode())
             throw new RuntimeException("密码错误");
         user.setUser_pass(newPass.hashCode());
@@ -359,4 +425,22 @@ public class UserService {
         response.addCookie(cookie);
     }
 
+
+    public List<User> listUser(int page,int length,User user){
+        int start = (page-1)*length;
+        return userDao.selectUser(start,length,user,user.getUser_role());
+    }
+
+    public int listUserCount(User user) {
+        return userDao.selectUserCount(user);
+    }
+
+
+    public int deleteUser(int userId) throws RequestException {
+        User user = userDao.get(userId);
+        if (user!=null&&user.getUser_role()==User.USER_ROLE_SUPER_ADMIN){
+            throw new RequestException("禁止删除超级管理员");
+        }
+        return userDao.deleteUser(userId);
+    }
 }

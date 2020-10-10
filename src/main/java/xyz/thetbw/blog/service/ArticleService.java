@@ -142,7 +142,7 @@ public class ArticleService {
     public boolean checkArticleAccessAuthorized(Article article, String pass){
         if (!StringUtils.getInstance().checkValidity(article.getArticle_access_pass())) return true;
         User user =userService.getUser();
-        if (user!=null&&user.getUser_role()==User.USER_ROLE_ADMIN) return true;
+        if (user!=null&&user.getUser_role()<=0) return true;
         String s = getAccessAuthorizedFromCookie(article);
         if (s!=null&&s.equals(article.getArticle_access_pass()))
             return true;

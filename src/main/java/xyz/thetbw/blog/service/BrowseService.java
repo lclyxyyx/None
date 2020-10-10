@@ -43,7 +43,7 @@ public class BrowseService {
             } catch (Exception e) {
             }
             if (user != null)
-                if (user.getUser_role() == User.USER_ROLE_ADMIN) return;
+                if (user.getUser_role() <=0) return;
             Browse browse = null;
             try {
                 browse = (Browse) session.getAttribute(FieldKey.BLOG_BROWSED);

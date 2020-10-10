@@ -15,9 +15,9 @@ public class AdminInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        User user = request.getSession().getAttribute(FieldKey.USER_ACCESS)==null?null:((User)request.getSession().getAttribute(FieldKey.USER_ACCESS));
         if (
-                request.getSession().getAttribute(FieldKey.USER_ACCESS)==null||
-                ((User)request.getSession().getAttribute(FieldKey.USER_ACCESS)).getUser_role()!=User.USER_ROLE_ADMIN
+                user==null||user.getUser_role()>0
         ) {
             response.sendRedirect("/login?referer=/admin");
             return false;

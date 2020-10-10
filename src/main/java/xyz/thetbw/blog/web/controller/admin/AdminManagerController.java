@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import xyz.thetbw.blog.annotation.PowerCheck;
 import xyz.thetbw.blog.data.dao.*;
 import xyz.thetbw.blog.data.entity.*;
 import xyz.thetbw.blog.exception.ArticleNotFountException;
@@ -51,6 +52,7 @@ public class AdminManagerController {
 
     @PostMapping("/article/deleteArticle")
     @Transactional
+    @PowerCheck(powers = {"article:delete"})
     public Object deleteArticle(@RequestParam int article_id) throws ArticleNotFountException {
         Article article = articleDao.get(article_id);
         if (article==null)
@@ -61,6 +63,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/article/switchArticleStatus")
+    @PowerCheck(powers = {"article:edit"})
     public Object switchArticleStatus(@RequestParam int article_id,@RequestParam int article_status){
         Article article = articleDao.get(article_id);
         if (article==null)
@@ -81,6 +84,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/comment/deleteComment")
+    @PowerCheck(powers = {"comment:delete"})
     public Object deleteComment(@RequestParam int comment_id){
         commentService.deleteComments(commentService.getComment(comment_id));
         return null;
@@ -93,6 +97,7 @@ public class AdminManagerController {
      * @return
      */
     @PostMapping("/comment/switchCommentStatus")
+    @PowerCheck(powers = {"comment:edit"})
     public Object switchCommentStatus(@RequestParam int comment_id,@RequestParam int comment_status){
         Comment comment =commentService.getComment(comment_id);
         if(comment!=null) {
@@ -125,6 +130,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/category/alterCategory")
+    @PowerCheck(powers = {"category:edit"})
     public Object alterCategory(@RequestParam int category_id,@RequestParam String category_name){
         Category category = categoryService.getCategory(category_id);
         if (category==null)
@@ -135,6 +141,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/category/addCategory")
+    @PowerCheck(powers = {"category:add"})
     public Object addCategory(@RequestParam int parent_id,@RequestParam String category_name){
         categoryService.addCategory(parent_id,category_name);
         return null;
@@ -147,6 +154,7 @@ public class AdminManagerController {
      */
     @PostMapping("/category/deleteCategory")
     @Transactional
+    @PowerCheck(powers = {"category:delete"})
     public Object deleteCategory(int category_id) throws RequestException {
         Category category = categoryService.getCategory(category_id);
         if (category==null)
@@ -185,6 +193,7 @@ public class AdminManagerController {
 
 
     @PostMapping("/page/addPage")
+    @PowerCheck(powers = {"page:add"})
     public Object addPage(@RequestBody String json){
         Gson gson = new Gson();
         Page page = gson.fromJson(json,Page.class);
@@ -194,6 +203,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/page/updatePage")
+    @PowerCheck(powers = {"page:edit"})
     public Object updatePage(@RequestBody String json){
         Gson gson = new Gson();
         Page page = gson.fromJson(json,Page.class);
@@ -203,6 +213,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/page/sortPage")
+    @PowerCheck(powers = {"page:edit"})
     public Object sortPage(@RequestBody String json){
         Gson gson = new Gson();
         JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
@@ -217,6 +228,7 @@ public class AdminManagerController {
     }
 
     @PostMapping("/page/deletePage")
+    @PowerCheck(powers = {"page:delete"})
     public Object deletePage(@RequestParam int page_id){
         pageService.deletePage(page_id);
         return null;

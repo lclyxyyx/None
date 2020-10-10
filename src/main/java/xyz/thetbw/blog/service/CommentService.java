@@ -72,7 +72,7 @@ public class CommentService {
         comment.setComment_body(StringUtils.getInstance().htmlTrans(comment_body));
         if (!AppContext.getInstance().setting.getCommentWithChecked())
             comment.setComment_status(Comment.COMMENT_STATUS_SHOW);
-        else if (user!=null&&user.getUser_role()== User.USER_ROLE_ADMIN){
+        else if (user!=null&&user.getUser_role()<=0){
             comment.setComment_status(Comment.COMMENT_STATUS_SHOW);
         }
         /**

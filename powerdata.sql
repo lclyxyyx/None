@@ -1,0 +1,15 @@
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (9, '文章管理', 'article', 1, null);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (10, '添加文章', 'article:add', 2, 9);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (11, '删除文章', 'article:delete', 2, 9);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (12, '修改文章', 'article:edit', 2, 9);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (13, '评论管理', 'comment', 1, null);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (14, '删除评论', 'comment:delete', 2, 13);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (15, '审核评论', 'comment:edit', 2, 13);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (16, '分类管理', 'category', 1, null);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (17, '增加分类', 'category:add', 2, 16);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (18, '编辑分类', 'category:edit', 2, 16);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (19, '删除分类', 'category:delete', 2, 16);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (20, '页面管理', 'page', 1, null);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (21, '增加页面', 'page:add', 2, 20);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (22, '修改页面', 'page:edit', 2, 20);
+INSERT INTO blog2.blog_power (power_id, power_name, power_ident, power_type, power_parent_id) VALUES (23, '删除页面', 'page:delete', 2, 20);

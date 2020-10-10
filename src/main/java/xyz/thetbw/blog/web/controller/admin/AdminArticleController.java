@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import xyz.thetbw.blog.annotation.PowerCheck;
 import xyz.thetbw.blog.data.dao.ArticleDao;
 import xyz.thetbw.blog.data.entity.Article;
 import xyz.thetbw.blog.data.entity.Content;
@@ -31,6 +32,7 @@ public class AdminArticleController {
      * @return
      */
     @PostMapping("/publishArticle")
+    @PowerCheck(powers = {"article:add"})
     public Object publishArticle(@RequestBody  String json){
         Article article = getArticleFromJson(json);
         try {
@@ -49,6 +51,7 @@ public class AdminArticleController {
     }
 
     @PostMapping("/updateArticle")
+    @PowerCheck(powers = {"article:edit"})
     public Object updateArticle(@RequestBody  String json)throws Exception{
         Article article = getArticleFromJson(json);
         Article old = articleService.getArticle(article.getArticle_id());

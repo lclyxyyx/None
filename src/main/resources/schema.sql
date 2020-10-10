@@ -104,6 +104,20 @@ CREATE TABLE IF NOT EXISTS blog_user(
     user_role int not null default 2,
     user_email varchar(255) null,
     user_avatar_url varchar(255)  null
-    
+)engine=InnoDB;
+
+CREATE TABLE IF NOT EXISTS blog_power(
+    power_id int not null PRIMARY KEY AUTO_INCREMENT ,
+    power_name varchar(64) not null ,
+    power_ident varchar(64) not null unique ,
+    power_type tinyint not null default 1 ,
+    power_parent_id int null
+)engine=InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS blog_user_power(
+    user_power_id int not null PRIMARY KEY AUTO_INCREMENT,
+    user_id int not null,
+    power_id int not null
 )engine=InnoDB;
 

@@ -1,6 +1,27 @@
 # **None** 
 **a java blog**
 
+###临时改动
+* 增加power表，保存系统的权限，user_power表，记录用户和权限的之间的关系
+
+权限说明：
+
+* 初次启动创建为超级管理员，拥有所有权限
+* 用户修改权限后需要重新登录才能成功
+* 部分需要权限的地方前端还没改，所以你可以在浏览器控制台看到报错，而前端没有任何提示
+* 在需要权限控制的地方加上 `@PowerCheck`注解来实现权限控制
+* 相关类
+ > `xyz.thetbw.blog.aspect.PowerAspect`
+ >
+ > `xyz.thetbw.blog.data.dao.PowerDao`
+ >
+ > `xyz.thetbw.blog.service.PowerService`
+
+* 登录使用cookie和session
+
+###安装
+除了下面的安装说明外，你需要另外执行`powerdata.sql`文件
+
 ### 简介：
 
 None 是我为了练习而制作的一款博客系统，因为想不到叫什么，所以，就叫None吧。目前可能会有一点小问题，日后会慢慢修复

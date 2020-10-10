@@ -42,7 +42,7 @@ public class InstallController extends BaseController {
         user = new User();
         user.setUser_name(user_name);
         user.setUser_pass(user_pass.hashCode());
-        user.setUser_role(User.USER_ROLE_ADMIN);
+        user.setUser_role(User.USER_ROLE_SUPER_ADMIN);
         user.setUser_nickname("admin");
         userDao.add(user);
         addPage();
